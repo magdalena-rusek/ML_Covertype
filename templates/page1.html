@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ML</title>
+</head>
+<body>
+Classifier: {{ classifier }} <br><br>
+Class | Prediction <br>
+    {% for y_t, y_p in classes %}
+        {{ y_t + 1 }} | {{ y_p + 1 }} <br>
+    {% endfor %}
+
+</body>
+</html>
