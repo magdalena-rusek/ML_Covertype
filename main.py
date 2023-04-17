@@ -34,6 +34,43 @@ def load_dataset():
 
     return x_train, x_test, y_train, y_test
 
+# 2. Implement a very simple heuristic that will classify the data
+def get_medians(x_train, y_train):
+    elevation = pd.DataFrame(x_train['Elevation'])
+    elevation['Cover_Type'] = y_train
+
+    medians = {}
+    for i in range(7):
+        cl = elevation.loc[elevation['Cover_Type'] == i]
+        print('i', i + 1, 'c ', np.median(cl['Elevation']))
+        medians[i] = np.median(cl)
+
+    print(medians)
+
+def get_pred(elevation):
+    if elevation <= 2413:
+        return 3 #4
+    elif 2413 < elevation <= 2431:
+        return 2 #3
+    elif 2431 < elevation <= 2777:
+        return 5 #6
+    elif 2777 < elevation <= 2847:
+        return 4 #5
+    elif 2847 < elevation <= 3055:
+        return 1 #2
+    elif 3055 < elevation <= 3365:
+        return 0 #1
+    elif 3365 < elevation:
+        return 6 #7
+
+def heuristic(x_test):
+    y_pred_heur = []
+
+    for x in x_test['Elevation']:
+        y_pred_heur.append(get_pred(x))
+
+    return y_pred_heur
+
 # 3. Use Scikit-learn library to train two simple Machine Learning models
 # 3.1 SVM
 def svm_classifier(x_train, y_train, x_test):
@@ -176,6 +213,8 @@ def get_cm(y_test, y_pred, name):
 if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_dataset()
 
+    #get_medians(x_train, y_train)
+
     #study()
     '''
     Best trial:
@@ -186,6 +225,9 @@ if __name__ == '__main__':
 		learning_rate: 0.0005546715423974959
 		epochs: 26
     '''
+
+    # Heuristic
+    y_pred_heur = heuristic(x_test)
 
     # SVM
     y_pred_svm = svm_classifier(x_train, y_train, x_test)
@@ -199,6 +241,11 @@ if __name__ == '__main__':
     plot_curves(history_nn)
 
     ########### Metrics ###########
+    # Simple Heuristic
+    f1_heur, prec_heur, rec_heur, acc_heur = get_metrics(y_test, y_pred_heur)
+    get_cm(y_test, y_pred_heur, 'Confusion matrix - Simple Heuristic')
+    print('Simple Heuristic:\nF1 score: ', f1_heur, '\nPrecision: ', prec_heur, '\nRecall: ', rec_heur, '\nAccuracy: ', acc_heur)
+
     # SVM
     f1_svm, prec_svm, rec_svm, acc_svm = get_metrics(y_test, y_pred_svm)
     get_cm(y_test, y_pred_svm, 'Confusion matrix - SVM')
@@ -213,5 +260,3 @@ if __name__ == '__main__':
     f1_nn, prec_nn, rec_nn, acc_nn = get_metrics(y_test, y_pred_nn)
     get_cm(y_test, y_pred_nn, 'Confusion matrix - NN')
     print('NN:\nF1 score: ', f1_nn, '\nPrecision: ', prec_nn, '\nRecall: ', rec_nn, '\nAccuracy: ', acc_nn)
-
-

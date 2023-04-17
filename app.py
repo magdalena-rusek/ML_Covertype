@@ -6,14 +6,16 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     ##
-    return render_template('main.html', classifiers=['SVM', 'k-NN', 'NN'])
+    return render_template('main.html', classifiers=['Simple heuristic', 'SVM', 'k-NN', 'NN'])
 
 @app.route('/predictions', methods=['POST'])
 def predictions():
     classifier = request.form['chosen_classifier']
     x_train, x_test, y_train, y_test = ml.load_dataset()
 
-    if classifier == 'SVM':
+    if classifier == 'Simple heuristic':
+        y_pred = ml.heuristic(x_test)
+    elif classifier == 'SVM':
         y_pred = ml.svm_classifier(x_train, y_train, x_test)
     elif classifier == 'k-NN':
         y_pred = ml.knn_classifier(x_train, y_train, x_test)
